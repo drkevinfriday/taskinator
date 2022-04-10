@@ -2,10 +2,10 @@
    //  var buttonEL = document.querySelector("#save-task");
     var formEL = document.querySelector('#task-form')
     var taskToDoEL = document.querySelector("#task-to-do");
-
+   //add
    var createTaskHandler = function(event){
 
-    event.preventDefault();
+   //  event.preventDefault();
 
     var listItemEL = document.createElement("li");
     listItemEL.className = "task-item";
