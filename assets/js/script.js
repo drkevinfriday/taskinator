@@ -2,8 +2,10 @@
    //  var buttonEL = document.querySelector("#save-task");
     var formEL = document.querySelector('#task-form')
     var taskToDoEL = document.querySelector("#task-to-do");
-   //add
-   var createTaskHandler = function(event){
+   // turns the user input into a object then calls the  create task function
+   var taskFormHandler = function(event){
+      // check if input values are empty strings
+   
 
     event.preventDefault();
    // saves the task input name as a variable
@@ -11,31 +13,46 @@
     // saves the task type from the drop down menuname as a variable
     var taskTypeInput = document.querySelector("select[name='task-type']").value;
 
-    console.log(taskNameInput);
-    console.log(taskTypeInput);
+   // package up data as an object
+   if (!taskNameInput || !taskTypeInput) {
+      alert("You need to fill out the task form!");
+      return false;
+      }
+   var taskDataObj ={
+      name: taskNameInput,
+      type: taskTypeInput
+   }
+
+   // send the task data to the create task function
+   createTaskEL(taskDataObj);
+   formEL.reset();
   
-   //creates a list element to save the new task item in 
-    var listItemEL = document.createElement("li");
-    // sets the class name for the new li
-    listItemEL.className = "task-item";
-
-    //creates a new div to hold the task info and a place to add the list item
-    var taskInfoEL = document.createElement("div")
-   // give the new div a clas
-   taskInfoEL.className = "task-info";
    
-   // add  HTML content to div
-   taskInfoEL.innerHTML = "<h3 class= 'task-name'>" +taskNameInput + "</h3><span class='task-type'>" + taskTypeInput + "</span>";
-   
-   console.log(taskInfoEL.innerHTML)
-//sets the task name and type as the  as a DOM List element
-   listItemEL.appendChild(taskInfoEL)
-
-    
-    
-   //  append the new li item to the Task to do DOM 
-    taskToDoEL.appendChild(listItemEL);
  }
 
-//  buttonEL.addEventListener("click", createTaskHandler);
-formEL.addEventListener("submit", createTaskHandler);
+ var createTaskEL = function(taskDataObj){
+//creates a list element to save the new task item in 
+var listItemEL = document.createElement("li");
+// sets the class name for the new li
+listItemEL.className = "task-item";
+
+//creates a new div to hold the task info and a place to add the list item
+var taskInfoEL = document.createElement("div")
+// give the new div a clas
+taskInfoEL.className = "task-info";
+
+// add  HTML content to div
+taskInfoEL.innerHTML = "<h3 class= 'task-name'>" +taskDataObj.name + "</h3><span class='task-type'>" + taskDataObj.type + "</span>";
+
+console.log(taskInfoEL.innerHTML)
+//sets the task name and type as the  as a DOM List element
+listItemEL.appendChild(taskInfoEL)
+
+
+
+//  append the new li item to the Task to do DOM 
+taskToDoEL.appendChild(listItemEL);
+ }
+
+//  buttonEL.addEventListener("click", taskFormHandler);
+formEL.addEventListener("submit", taskFormHandler);
