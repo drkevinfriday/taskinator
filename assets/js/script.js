@@ -1,6 +1,10 @@
 
   // create a task counter for the task id attribute
 var taskIdCouter = 0
+
+// array for task objects
+
+var tasks  = [];
   
   
   //  var buttonEL = document.querySelector("#save-task");
@@ -46,16 +50,18 @@ console.log("Is this task editted" + isEdit);
    }
    else{
       // sets the taskobject
-      var taskDataObj ={
+      var taskDataObj = {
          name: taskNameInput,
-         type: taskTypeInput
+         type: taskTypeInput,
+         status: "to do"
       };    
 
       // send the task data to the create task function
       createTaskEL(taskDataObj);
+      console.log(taskDataObj);
       formEL.reset();
 
-   }
+   } 
 }
 
 
@@ -77,7 +83,7 @@ var taskInfoEL = document.createElement("div")
 taskInfoEL.className = "task-info";
 
 // add  HTML content to div
-taskInfoEL.innerHTML = "<h3 class= 'task-name'>" +taskDataObj.name + "</h3><span class='task-type'>" + taskDataObj.type + "</span>";
+taskInfoEL.innerHTML = "<h3 class= 'task-name'>" + taskDataObj.name + "</h3><span class='task-type'>" + taskDataObj.type + "</span>";
 
 console.log(taskInfoEL.innerHTML)
 //sets the task name and type as the  as a DOM List element
@@ -87,6 +93,17 @@ var taskActionsEL = createTaskActions(taskIdCouter);
 
 console.log(taskActionsEL)
 listItemEL.appendChild(taskActionsEL);
+
+// update the task object with the current number in the task counter
+taskDataObj.id = taskIdCouter;
+
+console.log(taskDataObj);
+console.log("this is the task object status " + taskDataObj.status);
+
+// pushes the new task id to the task object 
+tasks.push(taskDataObj);
+
+saveTasks();
 
 //  append the new li item to the Task to do DOM 
 tasksToDoEL.appendChild(listItemEL);
@@ -156,6 +173,17 @@ var completeEditTask = function(taskName,taskType,taskId){
    taskSelected.querySelector("h3.task-name").textContent = taskName;
    taskSelected.querySelector("span.task-type").textContent = taskType;
 
+   // loop through tasks array and task object with new content
+   for (var i = 0; i < tasks.length; i++) {
+   if (tasks[i].id === parseInt(taskId)) {
+     tasks[i].name = taskName;
+     tasks[i].type = taskType;
+       }
+       
+   };
+
+   saveTasks();
+
    alert("Task Updated!");
    formEl.removeAttribute("data-task-id");
    document.querySelector("#save-task").textContent = "Add Task";
@@ -224,6 +252,15 @@ var taskStatusChangeHandler = function(event){
       tasksCompletedEl.appendChild(taskSelected);
     }
     
+    // update task's in tasks array
+   for (var i = 0; i < tasks.length; i++) {
+   if (tasks[i].id === parseInt(taskId)) {
+      tasks[i].status = statusValue;
+  }
+  console.log(tasks);
+
+}
+saveTasks();
 };
 
 
@@ -257,11 +294,62 @@ var editTask = function(taskId){
 var deleteTask = function(taskId){
    console.log("This is the task id " + taskId);
    var taskSelected = document.querySelector(".task-item[data-task-id='" + taskId +"']");
+   // removes selected task
    taskSelected.remove();
 
+    // create new array to hold updated list of tasks
+      var updatedTaskArr = [];
+
+   // loop through current tasks
+      for (var i = 0; i < tasks.length; i++) {
+  // if tasks[i].id doesn't match the value of taskId, let's keep that task and push it into the new array
+      if (tasks[i].id !== parseInt(taskId)) {
+       updatedTaskArr.push(tasks[i]);
+         }
+      }
+
+// reassign tasks array to be the same as updatedTaskArr
+tasks = updatedTaskArr;
+saveTasks();
 };
 
 
+var saveTasks = function(){
+   localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+var loadTask = function(){
+
+// Gets task items from localStorage.
+savedTasks = localStorage.getItem("tasks");
+
+
+// if there are no tasks, set tasks to an empty array and return out of the function
+if (!savedTasks){
+   return false;
+}
+
+console.log("Saved task found")
+// else, load up saved tasks
+
+ // parse into array of objects
+savedTasks= JSON.parse(savedTasks);
+
+// loop through savedTasks array
+for(var i = 0; i < savedTasks.length; i++){
+
+   // pass each task object to the form array
+   createTaskEL(savedTasks[i]);
+}
+
+
+// Converts tasks from the string format back into an array of objects.
+
+
+// Iterates through a tasks array and creates task elements on the page from it.
+
+
+};
 
 // create a new task
 formEL.addEventListener("submit", taskFormHandler);
@@ -272,3 +360,5 @@ pageContentEL.addEventListener("click", taskButtonHandler);
 
 // for changing the status
 pageContentEL.addEventListener("change", taskStatusChangeHandler);
+
+loadTask();
